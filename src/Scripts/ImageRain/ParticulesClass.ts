@@ -16,8 +16,6 @@ export class ParticulesClass {
    speed:    number;
    size:     number;
    velocity: number;
-   abs_X:    number;
-   abs_Y:    number;
 
    pixelArray: any;
 
@@ -37,8 +35,6 @@ export class ParticulesClass {
       this.speed    = 0;
       this.size     = Math.random() *1.5 +1;
       this.velocity = Math.random() *3;
-      this.abs_X    = Math.floor(this.x);
-      this.abs_Y    = Math.floor(this.y);
    }
 
    update() {
@@ -48,27 +44,28 @@ export class ParticulesClass {
          this.x = Math.random() *this.width;
       }
 
-      if(this.x >= this.width) {
+      else if(this.x >= this.width) {
          this.x = 0;
          this.y = Math.random() *this.height;
       }
 
-      this.abs_X      = Math.floor(this.x);
-      this.abs_Y      = Math.floor(this.y);
-      this.pixelArray = this.imageMap[this.abs_Y][this.abs_X];
+      const abs_X     = Math.floor(this.x);
+      const abs_Y     = Math.floor(this.y);
+      this.pixelArray = this.imageMap[abs_Y][abs_X];
       this.speed      = this.pixelArray.brightness;
       
       let movement    = (this.maxSpeed -this.speed) +this.velocity;
 
       this.y += movement;
-      this.x += movement /2;
+      this.x += movement *0.5;
    }
 
    draw() {
+      const ctx = this.ctx;
 
-      this.ctx.beginPath();
-      this.ctx.fillStyle = this.pixelArray.color;
-      this.ctx.arc(this.x, this.y, this.size, 0, Math.PI *2);
-      this.ctx.fill();
+      ctx.beginPath();
+      ctx.fillStyle = this.pixelArray.color;
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI *2);
+      ctx.fill();
    }
 }

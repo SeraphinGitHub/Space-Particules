@@ -91,21 +91,18 @@
                this.frame = 0;
                
                const ctx = this.ctx;
+               const particulesArray = this.particulesArray;
                
                ctx.globalAlpha = 0.05;
                ctx.fillStyle   = "black";
                ctx.fillRect(0, 0, this.width, this.height);
 
-               const particulesArray = this.particulesArray;
-   
                for(let i = 0; i < particulesArray.length; i++) {
                   const particule = particulesArray[i];
    
                   particule.update();
-                  
                   ctx.globalAlpha = particule.speed *0.5;
                   this.Cursor.interact(particule);
-
                   particule.draw();
                }
             };
