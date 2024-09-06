@@ -9,12 +9,12 @@
    import {
       ConstellationClass,
       CursorClass,
-   } from "../Classes/_export";
+   } from "../Scripts/SpaceParticules/_export";
 
    export default {
       data() {
          return {
-            imgPath:       "./images/star.png" as string,
+            imgPath:      "/images/star.png"   as string,
             ctx:           undefined           as CanvasRenderingContext2D | undefined,
             Constellation: undefined           as ConstellationClass       | undefined,
             Cursor:        undefined           as CursorClass              | undefined,

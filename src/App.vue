@@ -2,7 +2,8 @@
 <template>
    <section id="root">
 
-      <SpaceParticules/>
+      <!-- <SpaceParticules/> -->
+      <ImageRain/>
       
    </section>
 </template>
@@ -10,12 +11,14 @@
 <script>
    // Components 
    import SpaceParticules from "./Components/SpaceParticules.vue"
+   import ImageRain       from "./Components/ImageRain.vue"
 
    export default {
       name: "App",
 
       components: {
          SpaceParticules,
+         ImageRain,
       },
    }
 </script>
