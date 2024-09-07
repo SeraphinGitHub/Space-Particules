@@ -10,11 +10,12 @@ import {
 // =====================================================================
 export class CursorClass {
 
-   canvas:    HTMLCanvasElement;
+   canvas:       HTMLCanvasElement;
 
-   radius:    number  = 80;
-   gravity:   number  = 30;
-   isPressed: boolean = false;
+   radius:       number  = 80;
+   gravity:      number  = 30;
+   isAttracting: boolean = false;
+   isExploding:  boolean = false;
    
    position:   Iposition = {
       x: -this.radius,
@@ -27,31 +28,21 @@ export class CursorClass {
       this.canvas = canvas;
    }
 
-   detect(event: MouseEvent) {
-      this.position  = this.getMousePos(event);
-   }
-
-   detectClick(event: MouseEvent) {
-
-      this.isPressed = !this.isPressed;
-      // this.position  = this.getMousePos(event);
-   }
-
-   getMousePos(event: MouseEvent) {
+   setMousePos(event: MouseEvent) {
       let screenBound = this.canvas.getBoundingClientRect();
    
-      return {
+      this.position = {
          x: Math.floor( event.clientX -screenBound.left ),
          y: Math.floor( event.clientY -screenBound.top  ),
       }
    }
 
-   interact(particule: ParticulesClass) {
+   update(particule: ParticulesClass) {
       
-      if(this.checkCollision(particule)) this.handleCollision(particule);
+      if(this.isColliding(particule)) this.handleCollision(particule);
    }
 
-   checkCollision(
+   isColliding(
       particule: ParticulesClass,
    ): boolean {
 
@@ -67,25 +58,53 @@ export class CursorClass {
       return false;
    }
 
+   updatePosition(
+      position:  number,
+      coord:     number,
+      minBound:  number,
+      maxBound:  number,
+      pushSpeed: number,
+   ): number {
+
+      if (position > coord && position < maxBound) return  pushSpeed;
+      if (position < coord && position > minBound) return -pushSpeed;
+      
+      return 0;
+   }
+
    handleCollision(
       particule: ParticulesClass,
    ) {
-
-      if(this.isPressed) {
-         
-      }
-
-      const { x: partX, y: partY, size: partSize } = particule;
-      const { x, y }: Iposition = this.position;
+      const { x: partX,  y: partY, size: partSize } = particule;
+      const { x: mouseX, y: mouseY }: Iposition = this.position;
       const gravity:  number    = this.gravity;
       const halfSize: number    = partSize *0.5;
 
-      if(partX > x && partX < this.canvas.width  -halfSize) particule.x += gravity;
-      if(partY > y && partY < this.canvas.height -halfSize) particule.y += gravity;
-      if(partX < x && partX > halfSize)                     particule.x -= gravity;
-      if(partY < y && partY > halfSize)                     particule.y -= gravity;
+      const max_X = this.canvas.width  -halfSize;
+      const max_Y = this.canvas.height -halfSize;
 
-      if(particule.y < 0) particule.y = 0;
+      if(!this.isAttracting) {
+         particule.x  +=  this.updatePosition(partX, mouseX, halfSize, max_X, gravity);
+         particule.y  +=  this.updatePosition(partY, mouseY, halfSize, max_Y, gravity);
+      }
+
+      else {         
+         const distX:  number = partX -mouseX;
+         const distY:  number = partY -mouseY;
+         const angle:  number = (Math.atan2(distY, distX) * 180) / Math.PI;
+         const forceX: number = Math.cos(angle) *20;
+         const forceY: number = Math.sin(angle) *20;
+
+         particule.x += forceX;
+         particule.y += forceY;
+      }
+
+      if(this.isExploding) {
+         this.isAttracting = false;
+         this.isExploding  = false;
+      }
+      
       if(particule.x < 0) particule.x = 0;
+      if(particule.y < 0) particule.y = 0;
    }
 }
