@@ -44,6 +44,10 @@
             const Cursor  = new CursorClass(canvas);
             const imgData = this.extractImgData(ctx, picture);
 
+            const gradient = ctx.createLinearGradient(0, this.height, this.width, 0);
+            this.violetGradient(gradient);
+            // this.blueGradient(gradient);
+
             let particulesArray = [];
             let pixelsMap       = [];
 
@@ -65,7 +69,7 @@
             }
             
             for(let i = 0; i < this.particulesNumber; i++) {
-               particulesArray.push( new ParticulesClass(pixelsMap, i, this.width, this.height) );
+               particulesArray.push( new ParticulesClass(pixelsMap, i, this.width, this.height, gradient) );
             }
 
             window.addEventListener("mousemove", (event) => Cursor.setMousePos(event));
@@ -73,6 +77,31 @@
             window.addEventListener("mouseup",   (     ) => Cursor.isExploding  = true);
 
             this.animation(ctx, Cursor, particulesArray);
+         },
+
+         animation(ctx, Cursor, particulesArray) {
+            this.frame++;
+
+            if(this.frame % 2 === 0) {
+               this.frame = 0;
+               
+               ctx.globalAlpha = 0.05;
+               ctx.fillStyle   = "black";
+               ctx.fillRect(0, 0, this.width, this.height);
+
+               for(let i = 0; i < particulesArray.length; i++) {
+                  const particule = particulesArray[i];
+   
+                  particule.update();
+                  ctx.globalAlpha = particule.speed *0.4;
+                  Cursor.update(particule);
+
+                  particule.drawImgColor(ctx);
+                  // particule.drawGradient(ctx);
+               }
+            };
+            
+            requestAnimationFrame(() => this.animation(ctx, Cursor, particulesArray));
          },
 
          findIndex(x, y, modifier) {
@@ -103,27 +132,16 @@
             return data;
          },
 
-         animation(ctx, Cursor, particulesArray) {
-            this.frame++;
+         violetGradient(gradient) {
+            gradient.addColorStop(0,   "black");
+            gradient.addColorStop(0.5, "darkviolet");
+            gradient.addColorStop(1,   "gold");
+         },
 
-            if(this.frame % 2 === 0) {
-               this.frame = 0;
-               
-               ctx.globalAlpha = 0.05;
-               ctx.fillStyle   = "black";
-               ctx.fillRect(0, 0, this.width, this.height);
-
-               for(let i = 0; i < particulesArray.length; i++) {
-                  const particule = particulesArray[i];
-   
-                  particule.update();
-                  ctx.globalAlpha = particule.speed *0.4;
-                  Cursor.update(particule);
-                  particule.draw(ctx);
-               }
-            };
-            
-            requestAnimationFrame(() => this.animation(ctx, Cursor, particulesArray));
+         blueGradient(gradient) {
+            gradient.addColorStop(0,   "black");
+            gradient.addColorStop(0.5, "dodgerblue");
+            gradient.addColorStop(1,   "lime");
          },
       }
    }

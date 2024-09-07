@@ -11,6 +11,7 @@ export class ParticulesClass {
    y:          number;
    height:     number;
    width:      number;
+   gradient:   CanvasGradient;
 
    size:       number;
    velocity:   number;
@@ -24,6 +25,7 @@ export class ParticulesClass {
       id:       number,
       width:    number,
       height:   number,
+      gradient: CanvasGradient,
    ) {
       this.imageMap = imageMap;
       
@@ -32,6 +34,7 @@ export class ParticulesClass {
       this.y        = 0;
       this.width    = width;
       this.height   = height;
+      this.gradient = gradient;
       this.speed    = 0;
       this.size     = Math.random() *1.5 +1;
       this.velocity = Math.random() *3   +1;
@@ -55,17 +58,60 @@ export class ParticulesClass {
       // When reach border
       this.resetPosotion();
 
+      // ==> Using Image color or Gradient
+         // this.speed = this.maxSpeed;
+         this.setSpeedAndPixelColor();
+      //
+
+      // ==> Choose movement style
+         // const movement = this.setBrightFaster();
+         const movement = this.setDarkFaster();
+      //
+
+      // ==> Choose rain style
+         // this.uniformRain(movement);
+         this.crossedRain(movement);
+      //
+   }
+
+   setSpeedAndPixelColor() {
+
       const abs_X = Math.floor(this.x);
       const abs_Y = Math.floor(this.y);
       const { brightness, color } = this.imageMap[abs_Y][abs_X];
 
       this.speed      = brightness;
       this.pixelColor = color;
-      let movement    = (this.maxSpeed -this.speed) +this.velocity;
+   }
 
-      // this.x += movement *0.5;
-      // this.y += movement;
+   setBrightFaster(): number {
+      // Bright faster than dark colors ==> (If using Image color not Gradient)
+      return (this.maxSpeed -this.speed) +this.velocity;
+   }
 
+   setDarkFaster(): number {
+      // Dark faster than bright colors ==> (If using Image color not Gradient)
+      return this.speed +this.velocity;
+   }
+
+   uniformRain(movement: number) {
+
+      // Just Y vertical   rain
+      // Just X horizontal rain
+      // Both X & Y, 45° angle rain
+
+      this.x += movement *0.5;
+      this.y += movement;
+   }
+
+   crossedRain(movement: number) {
+      
+      // Tweak values to change rain angle
+      // Always max 1
+      // Ex: 0.6 with 0.4
+      // Ex: 0.8 with 0.2
+      // Reverse values for each statment
+      
       if(this.id % 2 === 0) {
          this.x += movement *0.4;
          this.y += movement *0.6;
@@ -77,10 +123,18 @@ export class ParticulesClass {
       }
    }
 
-   draw(ctx: CanvasRenderingContext2D) {
+   drawImgColor(ctx: CanvasRenderingContext2D) {
 
       ctx.beginPath();
       ctx.fillStyle = this.pixelColor;
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI *2);
+      ctx.fill();
+   }
+
+   drawGradient(ctx: CanvasRenderingContext2D) {
+
+      ctx.beginPath();
+      ctx.fillStyle = this.gradient;
       ctx.arc(this.x, this.y, this.size, 0, Math.PI *2);
       ctx.fill();
    }
